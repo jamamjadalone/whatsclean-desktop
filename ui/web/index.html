@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsClean Desktop - Private Storage Cleaner</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(30, 41, 59, 0.85);
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.25);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      background: #0284c7;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-badge svg {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff;
+    }
+
+    .brand-text h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .version-tag {
+      font-size: 0.7rem;
+      background: rgba(6, 182, 212, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .brand-text p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-offline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+    }
+
+    /* Hero Metrics Banner */
+    .hero-banner {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .metrics-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .metrics-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .metrics-val {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+
+    .metrics-safe {
+      font-size: 0.9rem;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      border: none;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background-color: #0284c7;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #0369a1;
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.7);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .safety-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .2s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #10b981;
+    }
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
+    /* Detected Apps Bar */
+    .apps-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .apps-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .app-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+    }
+
+    .app-chip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    /* Categories Grid */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title span {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .cat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+
+    .cat-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .cat-card.selected {
+      border-color: var(--accent);
+    }
+
+    .cat-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .cat-checkbox {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: #06b6d4;
+      cursor: pointer;
+    }
+
+    .cat-info {
+      flex: 1;
+    }
+
+    .cat-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .cat-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .cat-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .cat-badge-safe {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .cat-badge-caution {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      font-weight: 600;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .cat-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .cat-stats {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .cat-size {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .cat-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .btn-preview {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .btn-preview:hover {
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 680px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .btn-close:hover { color: #ffffff; }
+
+    .modal-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+
+    .file-item-name {
+      color: #e2e8f0;
+      font-family: monospace;
+      max-width: 380px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .file-item-size {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .btn-explorer {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #38bdf8;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .btn-explorer:hover {
+      background: rgba(6, 182, 212, 0.15);
+    }
+
+    /* Result Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      border: 1px solid #10b981;
+      color: #ffffff;
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 200;
+      font-size: 0.85rem;
+    }
+
+    .toast.active {
+      display: flex;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 16px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="logo-badge">
+        <svg viewBox="0 0 24 24" role="img" aria-label="WhatsClean Logo">
+          <title>WhatsClean Logo</title>
+          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>WhatsClean Desktop <span class="version-tag">v1.0.0</span></h1>
+        <p>Private and Offline Cache Reclaimer for Windows</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="badge-offline">
+        <div class="pulse-dot"></div>
+        100% Offline and Zero Telemetry
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Metrics Banner -->
+  <div class="hero-banner">
+    <div class="metrics-col">
+      <div class="metrics-label">Total Reclaimable Storage</div>
+      <div class="metrics-val" id="totalStorage">Scanning...</div>
+      <div class="metrics-safe" id="safeNotice">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" role="img" aria-label="Safe check">
+          <title>Safe check</title>
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span id="safeStorageText">Calculating safe items...</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" id="btnCleanSafe" onclick="cleanSafeJunk()">
+          <div class="spinner" id="cleanSpinner"></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" role="img" aria-label="Trash icon">
+            <title>Trash icon</title>
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          Clean Safe Junk Now
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnRescan" onclick="startScan()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" role="img" aria-label="Refresh icon">
+            <title>Refresh icon</title>
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          Rescan
+        </button>
+      </div>
+
+      <div class="safety-toggle">
+        <span>Windows Recycle Bin Safety (Allows Undo)</span>
+        <label class="switch" for="recycleBinToggle" aria-label="Windows Recycle Bin Safety switch">
+          <input type="checkbox" id="recycleBinToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detected Apps -->
+  <div class="apps-bar" id="appsBar">
+    <span class="apps-title">Detected Targets:</span>
+  </div>
+
+  <!-- Categories Section -->
+  <div class="section-title">
+    <span>Storage Breakdown by Category</span>
+    <button type="button" class="btn btn-secondary" style="padding:4px 12px; font-size:0.75rem;" onclick="cleanSelectedCategories()">
+      Clean Selected Checked
+    </button>
+  </div>
+
+  <div class="categories-grid" id="categoriesGrid"></div>
+
+  <!-- Footer -->
+  <footer>
+    <p>WhatsClean Desktop is a privacy-first, zero-telemetry utility designed for Windows.</p>
+    <p>Not affiliated with WhatsApp or Meta Platforms, Inc. All rights belong to their respective owners.</p>
+  </footer>
+
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalCategoryTitle">Category File Inspection</h3>
+      <button type="button" class="btn-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalFileList"></div>
+  </div>
+</div>
+
+<!-- Notification Toast -->
+<div class="toast" id="toast">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" role="img" aria-label="Success mark">
+    <title>Success mark</title>
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+  <span id="toastMsg">Operation completed successfully</span>
+</div>
+
+<script>
+  let currentScanData = null;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.pywebview) {
+      startScan();
+    } else {
+      window.addEventListener('pywebviewready', () => {
+        startScan();
+      });
+      setTimeout(() => {
+        if (!currentScanData && window.pywebview) {
+          startScan();
+        }
+      }, 500);
+    }
+  });
+
+  async function startScan() {
+    document.getElementById('totalStorage').textContent = 'Scanning...';
+    document.getElementById('safeStorageText').textContent = 'Inspecting local caches...';
+    try {
+      if (window.pywebview && window.pywebview.api) {
+        const res = await window.pywebview.api.scan();
+        renderScanResults(res);
+      }
+    } catch (e) {
+      document.getElementById('totalStorage').textContent = 'Scan error';
+    }
+  }
+
+  function renderScanResults(data) {
+    currentScanData = data;
+    document.getElementById('totalStorage').textContent = data.total_formatted || '0 B';
+    document.getElementById('safeStorageText').textContent = `${data.safe_formatted} can be safely deleted without losing chat data`;
+
+    // Render Apps bar safely without raw HTML injection
+    const appsBar = document.getElementById('appsBar');
+    while (appsBar.firstChild) {
+      appsBar.removeChild(appsBar.firstChild);
+    }
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'apps-title';
+    titleSpan.textContent = 'Detected Targets:';
+    appsBar.appendChild(titleSpan);
+
+    for (const [appName, stat] of Object.entries(data.apps || {})) {
+      const chip = document.createElement('div');
+      chip.className = 'app-chip';
+
+      const dot = document.createElement('div');
+      dot.className = 'app-chip-dot';
+
+      const label = document.createElement('span');
+      label.textContent = `${appName} (${stat.files_count} items - ${stat.total_formatted})`;
+
+      chip.appendChild(dot);
+      chip.appendChild(label);
+      appsBar.appendChild(chip);
+    }
+
+    // Render Categories safely
+    const grid = document.getElementById('categoriesGrid');
+    while (grid.firstChild) {
+      grid.removeChild(grid.firstChild);
+    }
+
+    for (const [key, cat] of Object.entries(data.categories || {})) {
+      const card = document.createElement('div');
+      card.className = `cat-card ${cat.safe_to_clean ? 'selected' : ''}`;
+      card.id = `card_${key}`;
+
+      const header = document.createElement('div');
+      header.className = 'cat-header';
+
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.className = 'cat-checkbox';
+      chk.id = `chk_${key}`;
+      chk.checked = cat.safe_to_clean && cat.count > 0;
+      chk.addEventListener('change', () => toggleCardSelect(key));
+
+      const info = document.createElement('div');
+      info.className = 'cat-info';
+
+      const titleRow = document.createElement('div');
+      titleRow.className = 'cat-title-row';
+
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'cat-title';
+      titleSpan.textContent = cat.title;
+
+      const badge = document.createElement('span');
+      badge.className = cat.safe_to_clean ? 'cat-badge-safe' : 'cat-badge-caution';
+      badge.textContent = cat.safe_to_clean ? '100% Safe' : 'Review Needed';
+
+      titleRow.appendChild(titleSpan);
+      titleRow.appendChild(badge);
+
+      const descP = document.createElement('p');
+      descP.className = 'cat-desc';
+      descP.textContent = cat.desc;
+
+      info.appendChild(titleRow);
+      info.appendChild(descP);
+
+      header.appendChild(chk);
+      header.appendChild(info);
+
+      const footer = document.createElement('div');
+      footer.className = 'cat-footer';
+
+      const stats = document.createElement('div');
+      stats.className = 'cat-stats';
+
+      const sizeSpan = document.createElement('span');
+      sizeSpan.className = 'cat-size';
+      sizeSpan.textContent = cat.size_formatted;
+
+      const countSpan = document.createElement('span');
+      countSpan.className = 'cat-count';
+      countSpan.textContent = `(${cat.count} files)`;
+
+      stats.appendChild(sizeSpan);
+      stats.appendChild(countSpan);
+
+      const btnPreview = document.createElement('button');
+      btnPreview.type = 'button';
+      btnPreview.className = 'btn-preview';
+      btnPreview.textContent = 'Inspect Files';
+      btnPreview.disabled = cat.count === 0;
+      btnPreview.addEventListener('click', () => openPreview(key));
+
+      footer.appendChild(stats);
+      footer.appendChild(btnPreview);
+
+      card.appendChild(header);
+      card.appendChild(footer);
+      grid.appendChild(card);
+    }
+  }
+
+  function toggleCardSelect(key) {
+    const chk = document.getElementById(`chk_${key}`);
+    const card = document.getElementById(`card_${key}`);
+    if (chk && card) {
+      if (chk.checked) {
+        card.classList.add('selected');
+      } else {
+        card.classList.remove('selected');
+      }
+    }
+  }
+
+  function getSelectedCategories() {
+    if (!currentScanData || !currentScanData.categories) return [];
+    const selected = [];
+    for (const key of Object.keys(currentScanData.categories)) {
+      const chk = document.getElementById(`chk_${key}`);
+      if (chk && chk.checked) {
+        selected.push(key);
+      }
+    }
+    return selected;
+  }
+
+  async function cleanSafeJunk() {
+    if (!currentScanData) return;
+    const safeKeys = Object.keys(currentScanData.categories).filter(
+      k => currentScanData.categories[k].safe_to_clean && currentScanData.categories[k].count > 0
+    );
+
+    if (safeKeys.length === 0) {
+      showToast('No safe junk files to clean right now.');
+      return;
+    }
+
+    await performCleaning(safeKeys);
+  }
+
+  async function cleanSelectedCategories() {
+    const selected = getSelectedCategories();
+    if (selected.length === 0) {
+      showToast('Please select at least one category to clean.');
+      return;
+    }
+    await performCleaning(selected);
+  }
+
+  async function performCleaning(categoriesList) {
+    const toRecycleBin = document.getElementById('recycleBinToggle').checked;
+    const btn = document.getElementById('btnCleanSafe');
+    const spinner = document.getElementById('cleanSpinner');
+    
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+
+    try {
+      if (window.pywebview && window.pywebview.api) {
+        const res = await window.pywebview.api.clean(categoriesList, toRecycleBin);
+        if (res.success) {
+          const modeMsg = toRecycleBin ? 'moved to Recycle Bin' : 'permanently deleted';
+          showToast(`Reclaimed ${res.bytes_freed_formatted} (${res.deleted} files ${modeMsg})!`);
+          if (res.refreshed_scan) {
+            renderScanResults(res.refreshed_scan);
+          }
+        } else {
+          showToast(res.message || 'Error occurred during cleaning');
+        }
+      }
+    } catch (e) {
+      showToast('Error during cleaning operation');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+    }
+  }
+
+  function openPreview(categoryKey) {
+    if (!currentScanData || !currentScanData.categories[categoryKey]) return;
+    const cat = currentScanData.categories[categoryKey];
+    document.getElementById('modalCategoryTitle').textContent = `${cat.title} - File Inspection`;
+
+    const list = document.getElementById('modalFileList');
+    while (list.firstChild) {
+      list.removeChild(list.firstChild);
+    }
+
+    if (!cat.files || cat.files.length === 0) {
+      const emptyP = document.createElement('p');
+      emptyP.style.color = 'var(--text-muted)';
+      emptyP.style.textAlign = 'center';
+      emptyP.style.padding = '20px';
+      emptyP.textContent = 'No files in this category.';
+      list.appendChild(emptyP);
+    } else {
+      cat.files.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'file-item-name';
+        nameDiv.title = f.path;
+        nameDiv.textContent = f.name;
+
+        const rightDiv = document.createElement('div');
+        rightDiv.className = 'file-item-right';
+
+        const sizeSpan = document.createElement('span');
+        sizeSpan.className = 'file-item-size';
+        sizeSpan.textContent = f.size_formatted;
+
+        const btnExplorer = document.createElement('button');
+        btnExplorer.type = 'button';
+        btnExplorer.className = 'btn-explorer';
+        btnExplorer.textContent = 'Show in Folder';
+        btnExplorer.addEventListener('click', () => openInExplorer(f.path));
+
+        rightDiv.appendChild(sizeSpan);
+        rightDiv.appendChild(btnExplorer);
+
+        item.appendChild(nameDiv);
+        item.appendChild(rightDiv);
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById('previewModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('previewModal').classList.remove('active');
+  }
+
+  async function openInExplorer(filePath) {
+    if (window.pywebview && window.pywebview.api) {
+      await window.pywebview.api.open_in_explorer(filePath);
+    }
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.classList.add('active');
+    setTimeout(() => {
+      toast.classList.remove('active');
+    }, 4000);
+  }
+</script>
+
+</body>
+</html>
